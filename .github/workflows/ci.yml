@@ -1,0 +1,88 @@
+name: Esteira de Validação — Detecção de Fraude
+
+# Simula a promoção entre ambientes de um time de ML de verdade:
+#   dev  -> feedback rapido, tuning leve (poucos trials)
+#   hom  -> esteira completa (o mesmo rigor de prod), gate antes de promover
+#   prod -> esteira completa + "deploy simulado", atras de um GitHub Environment
+#           com regra de aprovacao manual (configuravel em Settings -> Environments)
+#
+# Fluxo esperado: PR de dev -> hom (esteira completa roda e precisa passar) -> PR de
+# hom -> prod (mesma esteira completa + deploy simulado, com aprovacao manual).
+on:
+  push:
+    branches: [dev, hom, prod]
+  pull_request:
+    branches: [dev, hom, prod]
+  workflow_dispatch:
+
+jobs:
+  validar-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # 'environment' ativa as regras de protecao configuradas em Settings -> Environments
+    # (ex.: exigir aprovacao manual antes do job rodar em hom/prod) — em dev, sem gate.
+    environment: ${{ github.ref_name == 'prod' && 'producao' || github.ref_name == 'hom' && 'homologacao' || 'desenvolvimento' }}
+    env:
+      # dev: tuning leve (5 trials, ~segundos) para feedback rapido durante o desenvolvimento.
+      # hom/prod: tuning completo (usa o valor de config.yaml, o mesmo que valida o modelo
+      # que de fato seria promovido) — sem essa var, train.py usa o default do config.yaml.
+      HPO_N_TRIALS: ${{ github.ref_name == 'dev' && '5' || '' }}
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configura Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 1/6 — Ambiente reproduz (instala dependências)
+        run: pip install -r requirements.txt
+
+      - name: 2/6 — Pipeline completo (ingestão -> pré-processamento -> treino)
+        run: python run_pipeline.py
+
+      - name: 3/6 — Validação (métricas, curva de aprendizado, benchmarks de performance)
+        run: python -m src.evaluate
+
+      - name: 4/6 — Explicabilidade (SHAP)
+        run: python -m src.explainability
+
+      - name: 5/6 — Monitoramento de drift (PSI/KS)
+        run: python -m monitoring.drift_monitor
+
+      - name: 6/6 — Demonstração funcional (smoke test — predição real)
+        run: python smoke_test.py
+
+      - name: Publica métricas e gráficos gerados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-validacao-${{ github.ref_name }}
+          path: |
+            reports/*.json
+            reports/figures/*.png
+          retention-days: 30
+
+      # Só roda em prod, e só depois que as 6 checagens acima passaram — o "deploy" aqui
+      # e simulado (nao ha infraestrutura real por tras), mas o formato e o de um deploy
+      # de verdade: sobe a API, espera ficar de pe, confere /health, derruba.
+      - name: 7/7 — Deploy simulado (só em prod)
+        if: github.ref_name == 'prod'
+        run: |
+          python -m uvicorn deploy.api:app --host 127.0.0.1 --port 8000 &
+          SERVER_PID=$!
+          for i in $(seq 1 15); do
+            if curl -sf http://127.0.0.1:8000/health > /dev/null; then
+              echo "API de producao respondendo — deploy simulado OK"
+              curl -s http://127.0.0.1:8000/health
+              kill $SERVER_PID
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "API nao respondeu a tempo — deploy simulado FALHOU"
+          kill $SERVER_PID
+          exit 1

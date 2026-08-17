@@ -1,0 +1,20 @@
+data/*
+!data/.gitkeep
+models/*
+!models/.gitkeep
+mlruns/
+mlartifacts/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.egg-info/
+.env
+.venv/
+venv/
+
+# artefatos intermediarios de build do PDF final (fonte = relatorio.md + notebook .ipynb;
+# entregavel = Sistematizacao_TrilhaA_FraudDetection.pdf, que ja contem tudo isso)
+reports/relatorio.html
+reports/relatorio.pdf
+reports/notebook.html
+reports/notebook.pdf

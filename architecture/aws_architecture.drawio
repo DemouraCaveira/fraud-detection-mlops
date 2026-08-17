@@ -1,0 +1,134 @@
+<mxfile host="app.diagrams.net" agent="claude-code" version="24.0.0">
+  <diagram id="fraud-architecture" name="Arquitetura AWS - Deteccao de Fraude">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="950" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="Arquitetura AWS — Deteccao de Fraude em Producao (Trilha A)" style="text;html=1;fontSize=18;fontStyle=1;align=left;verticalAlign=middle;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="20" y="0" width="700" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Outer AWS Cloud group -->
+        <mxCell id="gcloud" value="AWS Cloud" style="sketch=0;outlineConnect=0;html=1;whiteSpace=wrap;fontSize=13;fontStyle=1;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud;verticalAlign=top;align=left;spacingLeft=32;spacingTop=6;dashed=0;fillColor=none;strokeColor=#232F3E;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="180" y="40" width="1160" height="850" as="geometry" />
+        </mxCell>
+
+        <!-- Phase sub-containers (decorative, plain rounded rect with corner label) -->
+        <mxCell id="g1" value="Data Lake" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#8C4FFF;verticalAlign=top;align=left;spacingLeft=10;spacingTop=4;fontSize=12;fontStyle=1;fontColor=#8C4FFF;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="210" y="80" width="1080" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="g2" value="Treino &amp; Registro (offline / agendado)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#01A88D;verticalAlign=top;align=left;spacingLeft=10;spacingTop=4;fontSize=12;fontStyle=1;fontColor=#01A88D;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="210" y="290" width="680" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="g3" value="Serving em tempo real — caminho critico de latencia" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#D97706;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=10;spacingTop=4;fontSize=12;fontStyle=1;fontColor=#D97706;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="210" y="480" width="680" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="g4" value="Monitoramento &amp; Retreino (feedback loop)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#E7157B;verticalAlign=top;align=left;spacingLeft=10;spacingTop=4;fontSize=12;fontStyle=1;fontColor=#E7157B;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="600" y="720" width="670" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- External actors (outside AWS Cloud) -->
+        <mxCell id="n1" value="Gateway de Pagamentos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F3F3;strokeColor=#545B64;fontSize=11;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="20" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="n11" value="Gateway de Pagamentos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F3F3;strokeColor=#545B64;fontSize=11;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="20" y="565" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ===== LANE 1: DATA LAKE (icon y=125) ===== -->
+        <mxCell id="n2" value="Amazon Kinesis&#10;Data Streams" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.kinesis_data_streams;" vertex="1" parent="1">
+          <mxGeometry x="240" y="125" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n3" value="Kinesis Data&#10;Firehose" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.kinesis_data_firehose;" vertex="1" parent="1">
+          <mxGeometry x="400" y="125" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n4" value="Amazon S3&#10;(raw zone)" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+          <mxGeometry x="560" y="125" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n5" value="AWS Glue&#10;ETL Job" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.glue;" vertex="1" parent="1">
+          <mxGeometry x="720" y="125" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n6" value="Amazon S3&#10;(curated)" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+          <mxGeometry x="880" y="125" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n7" value="SageMaker&#10;Feature Store" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#01A88D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sagemaker;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="125" width="48" height="48" as="geometry" />
+        </mxCell>
+
+        <!-- ===== LANE 2: TREINO & REGISTRO (icon y=335) ===== -->
+        <mxCell id="nt" value="Amazon&#10;EventBridge (cron)" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.eventbridge;" vertex="1" parent="1">
+          <mxGeometry x="240" y="335" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n8" value="SageMaker Training&#10;Job (Spot)" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#01A88D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sagemaker_train;" vertex="1" parent="1">
+          <mxGeometry x="400" y="335" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n9" value="Gate de&#10;Aprovacao" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F3F3;strokeColor=#545B64;fontSize=11;fontColor=#232F3E;verticalAlign=middle;align=center;" vertex="1" parent="1">
+          <mxGeometry x="562" y="343" width="60" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n10" value="SageMaker Model&#10;Registry" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#01A88D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sagemaker_model;" vertex="1" parent="1">
+          <mxGeometry x="720" y="335" width="48" height="48" as="geometry" />
+        </mxCell>
+
+        <!-- ===== LANE 3: SERVING (icon y=515, hero bigger) ===== -->
+        <mxCell id="n12" value="Amazon API&#10;Gateway" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="1">
+          <mxGeometry x="240" y="515" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n13" value="AWS Lambda&#10;(validacao)" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="400" y="515" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n14" value="SageMaker Real-Time&#10;Endpoint (multi-AZ)" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#01A88D;strokeColor=#D97706;strokeWidth=3;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sagemaker_model;" vertex="1" parent="1">
+          <mxGeometry x="590" y="500" width="64" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="stat" value="p50 1,0 ms · p95 1,7 ms · p99 2,1 ms (medido)" style="text;html=1;fontSize=11;fontStyle=1;fontColor=#D97706;align=center;verticalAlign=middle;fillColor=#FFF7EC;strokeColor=#D97706;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="605" width="300" height="26" as="geometry" />
+        </mxCell>
+
+        <!-- ===== LANE 4: MONITORAMENTO (icon y=755) ===== -->
+        <mxCell id="n17" value="Amazon S3&#10;(logs inferencia)" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+          <mxGeometry x="630" y="755" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n18" value="SageMaker&#10;Model Monitor" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#01A88D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sagemaker;" vertex="1" parent="1">
+          <mxGeometry x="790" y="755" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n19" value="Amazon&#10;CloudWatch" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch;" vertex="1" parent="1">
+          <mxGeometry x="950" y="755" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="n20" value="Amazon SNS&#10;(alerta)" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sns;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="755" width="48" height="48" as="geometry" />
+        </mxCell>
+
+        <!-- footnote -->
+        <mxCell id="note" value="Rotulos de fraude confirmados (chargeback) chegam com atraso de dias — concept drift so e observavel depois." style="text;html=1;fontSize=10;fontStyle=2;fontColor=#545B64;align=center;" vertex="1" parent="1">
+          <mxGeometry x="600" y="855" width="670" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ============ EDGES ============ -->
+        <mxCell id="e1" value="① evento" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;fontSize=10;fontColor=#545B64;endArrow=block;elbow=vertical;startArrow=none;" edge="1" parent="1" source="n1" target="n2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="n2" target="n3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="n3" target="n4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="n4" target="n5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="n5" target="n6"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" value="② features prontas" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;fontSize=10;fontColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="n6" target="n7"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" value="③ dispara treino" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;fontSize=10;fontColor=#545B64;endArrow=block;startArrow=none;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="n7" target="n8"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1064" y="290" /><mxPoint x="424" y="290" /></Array></mxGeometry></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="nt" target="n8"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" value="avalia" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;fontSize=10;fontColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="n8" target="n9"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e10" value="④ aprovado" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;fontSize=10;fontColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="n9" target="n10"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e11" value="deploy (blue/green)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;fontSize=10;fontColor=#545B64;endArrow=block;startArrow=none;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="n10" target="n14"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="744" y="450" /><mxPoint x="622" y="450" /></Array></mxGeometry></mxCell>
+
+        <mxCell id="e12" value="⑤ autoriza" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#D97706;strokeWidth=2;fontSize=10;fontColor=#D97706;endArrow=block;startArrow=none;" edge="1" parent="1" source="n11" target="n12"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#D97706;strokeWidth=2;endArrow=block;startArrow=none;" edge="1" parent="1" source="n12" target="n13"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e14" value="invoke" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#D97706;strokeWidth=2;fontSize=10;fontColor=#D97706;endArrow=block;startArrow=none;" edge="1" parent="1" source="n13" target="n14"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e15" value="decisao: aprovar/bloquear · ponta a ponta ~15-30ms" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#D97706;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#D97706;endArrow=block;startArrow=none;exitX=0.5;exitY=0;entryX=0.5;entryY=0;" edge="1" parent="1" source="n14" target="n11"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="622" y="470" /><mxPoint x="80" y="470" /></Array></mxGeometry></mxCell>
+
+        <mxCell id="e16" value="⑥ data capture" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;fontSize=10;fontColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="n14" target="n17"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e17" value="⑦ compara vs. baseline" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;fontSize=10;fontColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="n17" target="n18"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e18" value="⑧ PSI &gt; 0,25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;fontSize=10;fontColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="n18" target="n19"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e19" value="alerta" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;fontSize=10;fontColor=#545B64;endArrow=block;startArrow=none;" edge="1" parent="1" source="n19" target="n20"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e20" value="⑨ retrain automatico" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#01A88D;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#01A88D;endArrow=block;startArrow=none;exitX=0.5;exitY=0;entryX=1;entryY=0.5;" edge="1" parent="1" source="n19" target="n8"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="974" y="700" /><mxPoint x="1340" y="700" /><mxPoint x="1340" y="260" /><mxPoint x="448" y="260" /></Array></mxGeometry></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

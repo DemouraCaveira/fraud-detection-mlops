@@ -1,0 +1,54 @@
+{
+  "top_features_by_shap": [
+    {
+      "feature": "V4",
+      "mean_abs_shap": 0.6827889715441047
+    },
+    {
+      "feature": "V8",
+      "mean_abs_shap": 0.42942696383383316
+    },
+    {
+      "feature": "V14",
+      "mean_abs_shap": 0.37178786646143397
+    },
+    {
+      "feature": "V1",
+      "mean_abs_shap": 0.3573417651652678
+    },
+    {
+      "feature": "hour_sin",
+      "mean_abs_shap": 0.31743636253526225
+    },
+    {
+      "feature": "V18",
+      "mean_abs_shap": 0.3170829449248336
+    },
+    {
+      "feature": "V5",
+      "mean_abs_shap": 0.25894329029800944
+    },
+    {
+      "feature": "V12",
+      "mean_abs_shap": 0.2307269612404089
+    },
+    {
+      "feature": "V17",
+      "mean_abs_shap": 0.21985749213555836
+    },
+    {
+      "feature": "V19",
+      "mean_abs_shap": 0.16178326007165608
+    }
+  ],
+  "example_fraud_case": {
+    "predicted_probability": 0.9993365070193594,
+    "top_contributing_features": {
+      "V14": 6.772806349787623,
+      "V12": 2.157293901704217,
+      "V10": 1.7910602253036512,
+      "V4": 1.6364904902475685,
+      "amount_log": 0.44924652458098663
+    }
+  }
+}
