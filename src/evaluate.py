@@ -90,7 +90,8 @@ def cross_validate(model_ctor, train_df: pd.DataFrame, config: dict) -> list[flo
     conjunto de treino — reporta PR-AUC por fold para discutir overfitting/underfitting."""
     target_col = config["features"]["target_col"]
     feature_cols = get_feature_columns(train_df, config)
-    k = config["evaluation"]["cv_folds"]
+    env_k = os.environ.get("CV_FOLDS", "").strip()
+    k = int(env_k) if env_k else config["evaluation"]["cv_folds"]
     seed = config["project"]["random_seed"]
 
     skf = StratifiedKFold(n_splits=k, shuffle=True, random_state=seed)
@@ -165,8 +166,13 @@ def complexity_comparison_benchmark(train_df: pd.DataFrame, config: dict, lgbm_c
     target_col = config["features"]["target_col"]
     feature_cols = get_feature_columns(train_df, config)
     cfg = config["evaluation"]["complexity_comparison"]
-    row_sizes = cfg["row_sizes"]
-    n_repeats = cfg["n_query_repeats"]
+    # mesmo padrao de override por env var usado em scale_benchmark/tune_lightgbm —
+    # a esteira de CI usa tamanhos e repeticoes menores (runner compartilhado, mais
+    # lento que uma maquina dedicada); o estudo completo ja esta no relatorio.
+    env_row_sizes = os.environ.get("COMPLEXITY_ROW_SIZES", "").strip()
+    row_sizes = [int(x) for x in env_row_sizes.split(",") if x.strip()] if env_row_sizes else cfg["row_sizes"]
+    env_n_repeats = os.environ.get("COMPLEXITY_N_REPEATS", "").strip()
+    n_repeats = int(env_n_repeats) if env_n_repeats else cfg["n_query_repeats"]
     seed = config["project"]["random_seed"]
     rng = np.random.default_rng(seed)
 
@@ -206,13 +212,18 @@ def learning_curve_data(model_ctor, train_df: pd.DataFrame, config: dict) -> dic
     feature_cols = get_feature_columns(train_df, config)
     seed = config["project"]["random_seed"]
 
+    # override por env var (mesmo padrao das demais funcoes de benchmark) — reduz
+    # cv/pontos da curva na esteira de CI, sem alterar o comportamento local/relatorio.
+    cv = int(os.environ.get("LEARNING_CURVE_CV", "3"))
+    n_points = int(os.environ.get("LEARNING_CURVE_N_POINTS", "6"))
+
     train_sizes, train_scores, val_scores = learning_curve(
         model_ctor(),
         train_df[feature_cols],
         train_df[target_col],
-        cv=3,
+        cv=cv,
         scoring="average_precision",
-        train_sizes=np.linspace(0.1, 1.0, 6),
+        train_sizes=np.linspace(0.1, 1.0, n_points),
         random_state=seed,
         n_jobs=-1,
     )

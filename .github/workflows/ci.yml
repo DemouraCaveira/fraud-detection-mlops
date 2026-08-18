@@ -34,9 +34,19 @@ jobs:
     env:
       # dev: tuning leve (5 trials) + benchmark de escala reduzido, para feedback rapido.
       # hom: tuning completo (o mesmo config.yaml que valida o modelo que sera promovido)
-      # — sem essas vars, os scripts usam o default de config.yaml.
+      # — sem essas vars, os scripts usam o default de config.yaml. Os demais benchmarks
+      # (escala, complexidade, curva de aprendizado, CV) sao reduzidos em AMBAS as
+      # branches na CI — isso afeta so o tempo de execucao no runner compartilhado, nao
+      # o rigor da validacao de hiperparametros; os estudos completos ja estao no
+      # relatorio (reports/relatorio.md) e podem ser reproduzidos localmente a qualquer
+      # momento com `python -m src.evaluate` (sem essas env vars).
       HPO_N_TRIALS: ${{ github.ref_name == 'dev' && '5' || '' }}
-      SCALE_BENCHMARK_MULTIPLIERS: ${{ github.ref_name == 'dev' && '1,2' || '1,5,10' }}
+      SCALE_BENCHMARK_MULTIPLIERS: "1,5"
+      COMPLEXITY_ROW_SIZES: "5000,50000"
+      COMPLEXITY_N_REPEATS: "20"
+      LEARNING_CURVE_CV: "2"
+      LEARNING_CURVE_N_POINTS: "3"
+      CV_FOLDS: "3"
 
     steps:
       - name: Checkout do repositório
