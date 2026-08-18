@@ -25,6 +25,7 @@ from __future__ import annotations
 # a ordem sempre assim por seguranca/portabilidade.
 import lightgbm as lgb
 
+import os
 import time
 
 import numpy as np
@@ -112,7 +113,15 @@ def scale_benchmark(train_df: pd.DataFrame, config: dict, model_ctor) -> pd.Data
     provando que o pipeline escala para volumes tipo 'big data' sem crescimento explosivo."""
     target_col = config["features"]["target_col"]
     feature_cols = get_feature_columns(train_df, config)
-    multipliers = config["evaluation"]["scale_benchmark"]["row_multipliers"]
+    # SCALE_BENCHMARK_MULTIPLIERS permite encolher o benchmark (ex.: "1,5" em vez de
+    # "1,2,5,10,20") sem editar config.yaml — usado pela esteira de CI, onde o runner
+    # compartilhado e mais lento que uma maquina dedicada e o benchmark completo (que
+    # sobe ate 20x/~4M linhas) sozinho ja passa de tempo de sobra do limite do job.
+    env_multipliers = os.environ.get("SCALE_BENCHMARK_MULTIPLIERS", "").strip()
+    if env_multipliers:
+        multipliers = [int(x) for x in env_multipliers.split(",") if x.strip()]
+    else:
+        multipliers = config["evaluation"]["scale_benchmark"]["row_multipliers"]
     seed = config["project"]["random_seed"]
     rng = np.random.default_rng(seed)
 

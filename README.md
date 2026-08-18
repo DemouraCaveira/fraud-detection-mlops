@@ -113,8 +113,10 @@ navegador nem Postman — melhor para uma demo rápida em sala.
 `.github/workflows/ci.yml` roda automaticamente a cada `push`/PR nas branches `dev`,
 `hom` e `prod` (e manualmente pela aba **Actions**, botão "Run workflow"). Diferente da
 esteira do `esteira-kit` da turma (que só confere formato de arquivos), esta roda o
-pipeline de verdade, do zero, em uma máquina limpa da GitHub:
+pipeline de verdade, do zero, em uma máquina limpa da GitHub — com um princípio central:
+**`prod` nunca re-treina o modelo**, ele promove o exato artefato já validado em `hom`.
 
+Em `dev`/`hom`:
 1. Instala as dependências (`requirements.txt`)
 2. Roda `run_pipeline.py` (ingestão → pré-processamento → treino) — a mesma prova de
    reprodutibilidade feita localmente, mas agora em uma máquina que nunca viu este
@@ -122,16 +124,19 @@ pipeline de verdade, do zero, em uma máquina limpa da GitHub:
 3. Roda validação (`src.evaluate`), explicabilidade (`src.explainability`) e
    monitoramento de drift (`monitoring.drift_monitor`)
 4. Roda `smoke_test.py` — se a esteira ficar verde, uma predição real foi executada
-5. Publica os gráficos e métricas gerados como artefato do workflow (aba Actions →
-   clique na execução → "Artifacts")
-6. **Só em `prod`**: um passo extra sobe a API real, confere `/health` e derruba — um
-   deploy simulado, mas que roda de verdade
+5. Publica os gráficos e métricas gerados como artefato do workflow
+6. **Só em `hom`**: publica o modelo treinado como artefato (`modelo-treinado`) — é
+   esse binário exato, e nenhum outro, que `prod` vai usar
+
+Em `prod`: roda `prepare_data.py` (só ingestão/pré-processamento, sem treino), baixa o
+`modelo-treinado` do último build bem-sucedido de `hom`, roda `smoke_test.py` sobre esse
+artefato e faz o deploy simulado (sobe a API real, confere `/health`, derruba).
 
 O repositório simula três ambientes (`dev` → `hom` → `prod`) para mostrar como a
-promoção de um modelo passa por estágios de rigor crescente — ver
-**[`BRANCHING.md`](BRANCHING.md)** para o fluxo completo (o que muda em cada branch,
-como promover uma mudança via Pull Request, como configurar aprovação manual antes de
-produção).
+promoção de um modelo passa por estágios de rigor crescente sem nunca re-treinar fora
+do estágio de validação — ver **[`BRANCHING.md`](BRANCHING.md)** para o fluxo completo
+(o porquê de "build once, promote the artifact", como promover uma mudança via Pull
+Request, como configurar aprovação manual antes de produção).
 
 **Pré-requisito para isso rodar**: é preciso `git init`, criar o repositório no GitHub
 e dar `git push` — nada nisso acontece sozinho.

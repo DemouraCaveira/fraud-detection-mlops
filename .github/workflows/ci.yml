@@ -1,13 +1,19 @@
 name: Esteira de Validação — Detecção de Fraude
 
-# Simula a promoção entre ambientes de um time de ML de verdade:
-#   dev  -> feedback rapido, tuning leve (poucos trials)
-#   hom  -> esteira completa (o mesmo rigor de prod), gate antes de promover
-#   prod -> esteira completa + "deploy simulado", atras de um GitHub Environment
-#           com regra de aprovacao manual (configuravel em Settings -> Environments)
+# Simula a promoção entre ambientes de um time de ML de verdade — build-once,
+# promote-the-same-artifact, NUNCA retreina a cada estagio:
 #
-# Fluxo esperado: PR de dev -> hom (esteira completa roda e precisa passar) -> PR de
-# hom -> prod (mesma esteira completa + deploy simulado, com aprovacao manual).
+#   dev  -> treina e valida (feedback rapido, tuning leve)
+#   hom  -> treina e valida por completo (o gate real) e PUBLICA o modelo treinado
+#           como artefato do workflow
+#   prod -> NAO treina nada. Baixa o artefato do ultimo `hom` bem-sucedido, roda o
+#           smoke test sobre esse artefato exato e faz o deploy simulado. Se prod
+#           re-treinasse, nao haveria garantia de que o binario testado em hom e o
+#           mesmo que vai pra producao — e essa garantia e o ponto central de uma
+#           esteira de promocao.
+#
+# Fluxo esperado: PR de dev -> hom (treina + esteira completa, publica artefato) ->
+# PR de hom -> prod (baixa o artefato de hom, NAO re-treina, smoke test + deploy).
 on:
   push:
     branches: [dev, hom, prod]
@@ -16,17 +22,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  validar-pipeline:
+  # ---------------------------------------------------------------------------------
+  # dev e hom: pipeline completo (treina de verdade). hom publica o modelo treinado
+  # como artefato do workflow — e esse artefato, e nenhum outro, que prod vai usar.
+  # ---------------------------------------------------------------------------------
+  treinar-e-validar:
+    if: github.ref_name != 'prod'
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # 'environment' ativa as regras de protecao configuradas em Settings -> Environments
-    # (ex.: exigir aprovacao manual antes do job rodar em hom/prod) — em dev, sem gate.
-    environment: ${{ github.ref_name == 'prod' && 'producao' || github.ref_name == 'hom' && 'homologacao' || 'desenvolvimento' }}
+    environment: ${{ github.ref_name == 'hom' && 'homologacao' || 'desenvolvimento' }}
     env:
-      # dev: tuning leve (5 trials, ~segundos) para feedback rapido durante o desenvolvimento.
-      # hom/prod: tuning completo (usa o valor de config.yaml, o mesmo que valida o modelo
-      # que de fato seria promovido) — sem essa var, train.py usa o default do config.yaml.
+      # dev: tuning leve (5 trials) + benchmark de escala reduzido, para feedback rapido.
+      # hom: tuning completo (o mesmo config.yaml que valida o modelo que sera promovido)
+      # — sem essas vars, os scripts usam o default de config.yaml.
       HPO_N_TRIALS: ${{ github.ref_name == 'dev' && '5' || '' }}
+      SCALE_BENCHMARK_MULTIPLIERS: ${{ github.ref_name == 'dev' && '1,2' || '1,5,10' }}
 
     steps:
       - name: Checkout do repositório
@@ -66,17 +76,79 @@ jobs:
             reports/figures/*.png
           retention-days: 30
 
-      # Só roda em prod, e só depois que as 6 checagens acima passaram — o "deploy" aqui
-      # e simulado (nao ha infraestrutura real por tras), mas o formato e o de um deploy
-      # de verdade: sobe a API, espera ficar de pe, confere /health, derruba.
-      - name: 7/7 — Deploy simulado (só em prod)
-        if: github.ref_name == 'prod'
+      # Só em hom: o artefato que prod vai baixar e promover — SEM retreinar.
+      - name: Publica o modelo treinado (candidato a promoção para prod)
+        if: github.ref_name == 'hom'
+        uses: actions/upload-artifact@v4
+        with:
+          name: modelo-treinado
+          path: |
+            models/*.joblib
+            models/*.json
+          retention-days: 90
+
+  # ---------------------------------------------------------------------------------
+  # prod: NAO treina. Baixa o artefato publicado pelo ultimo `hom` bem-sucedido e roda
+  # só a validação funcional (smoke test) + deploy simulado sobre esse artefato exato.
+  # ---------------------------------------------------------------------------------
+  promover-producao:
+    if: github.ref_name == 'prod'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: producao
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configura Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Instala dependências
+        run: pip install -r requirements.txt
+
+      - name: Prepara os dados (sem treinar — o modelo vem de hom)
+        run: python prepare_data.py
+
+      - name: Localiza o último build bem-sucedido em hom
+        id: hom_run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --branch hom --workflow ci.yml \
+                    --status success --limit 1 --json databaseId --jq '.[0].databaseId')
+          if [ -z "$RUN_ID" ]; then
+            echo "Nenhum build bem-sucedido encontrado em hom — nada para promover a prod." >&2
+            exit 1
+          fi
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "Promovendo o artefato do run hom #$RUN_ID"
+
+      - name: Baixa o modelo treinado e validado em hom (não retreina)
+        uses: actions/download-artifact@v4
+        with:
+          name: modelo-treinado
+          path: models
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.hom_run.outputs.run_id }}
+
+      - name: Demonstração funcional sobre o modelo promovido (smoke test)
+        run: python smoke_test.py
+
+      - name: Deploy simulado
         run: |
           python -m uvicorn deploy.api:app --host 127.0.0.1 --port 8000 &
           SERVER_PID=$!
           for i in $(seq 1 15); do
             if curl -sf http://127.0.0.1:8000/health > /dev/null; then
-              echo "API de producao respondendo — deploy simulado OK"
+              echo "API de producao respondendo — deploy simulado OK (modelo do run hom #${{ steps.hom_run.outputs.run_id }})"
               curl -s http://127.0.0.1:8000/health
               kill $SERVER_PID
               exit 0
