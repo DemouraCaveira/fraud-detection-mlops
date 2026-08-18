@@ -72,8 +72,11 @@ def tune_lightgbm(train_df: pd.DataFrame, val_df: pd.DataFrame, config: dict) ->
 
     # HPO_N_TRIALS permite sobrescrever o numero de trials sem editar config.yaml — usado
     # pela esteira de CI para rodar um tuning "leve" na branch dev (feedback rapido) e o
-    # tuning completo em hom/prod (mesmo espaco de busca, validado de verdade).
-    n_trials = int(os.environ.get("HPO_N_TRIALS", hpo_cfg["n_trials"]))
+    # tuning completo em hom/prod (mesmo espaco de busca, validado de verdade). O workflow
+    # do GitHub Actions sempre DEFINE a env var (mesmo vazia em hom/prod), entao checamos
+    # string vazia explicitamente em vez de confiar so no default do os.environ.get.
+    env_n_trials = os.environ.get("HPO_N_TRIALS", "").strip()
+    n_trials = int(env_n_trials) if env_n_trials else hpo_cfg["n_trials"]
 
     n_pos = train_df[target_col].sum()
     n_neg = len(train_df) - n_pos

@@ -1,20 +1,25 @@
-requests>=2.31,<3.0
-pandas>=2.2,<3.0
-numpy>=2.0,<3.0
-scikit-learn>=1.5,<2.0
-lightgbm>=4.3,<5.0
-optuna>=3.6,<4.0
-shap>=0.46,<0.47
-matplotlib>=3.9,<4.0
-seaborn>=0.13,<0.14
-mlflow>=2.14,<3.0
-fastapi>=0.111,<1.0
-uvicorn>=0.30,<1.0
-pydantic>=2.7,<3.0
-faker>=25.0,<26.0
-pyarrow>=16.0,<17.0
-joblib>=1.4,<2.0
-pyyaml>=6.0,<7.0
-nbclient>=0.10,<1.0
-nbformat>=5.10,<6.0
-ipykernel>=6.29,<7.0
+# Versoes fixadas (nao faixas) de proposito: a esteira de CI ja pegou uma combinacao de
+# numpy/shap resolvida por faixa que quebrava (numpy>=2.1 muda o comportamento de
+# np.dtype() e colide com codigo vendorizado do shap 0.46 para conversao de cores) —
+# fixar exatamente o que foi validado localmente e na CI e o unico jeito de garantir que
+# "reproduz no meu computador" e "reproduz na esteira" sejam a mesma coisa.
+requests==2.32.5
+pandas==2.2.2
+numpy==2.0.0
+scikit-learn==1.9.0
+lightgbm==4.7.0
+optuna==3.6.2
+shap==0.46.0
+matplotlib==3.9.0
+seaborn==0.13.2
+mlflow==2.22.5
+fastapi==0.141.1
+uvicorn==0.52.1
+pydantic==2.13.4
+faker==25.9.2
+pyarrow==16.1.0
+joblib==1.5.3
+pyyaml==6.0.3
+nbclient==0.11.0
+nbformat==5.10.4
+ipykernel==6.29.5
