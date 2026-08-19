@@ -4,18 +4,18 @@ Este é o arquivo para rodar em aula e mostrar o modelo "em operação" — não
 (isso é `run_pipeline.py`), só carrega o modelo já treinado e o coloca para funcionar,
 das duas formas que um modelo roda em produção:
 
-  1. Modo demonstração (padrão): gera transações sintéticas (Faker) e roda inferência
-     real sobre elas, imprimindo a decisão no terminal — sem precisar de navegador nem
-     de ferramenta externa (Postman etc.), bom para uma demo rápida em sala.
-  2. Modo servidor (--serve): sobe a API de inferência de verdade (FastAPI/uvicorn),
-     o mesmo tipo de processo que rodaria atrás de um load balancer em produção —
-     acessível em http://127.0.0.1:8000/docs, com Swagger interativo.
+  1. Modo servidor (padrão): sobe a API de inferência de verdade (FastAPI/uvicorn),
+     o mesmo tipo de processo que rodaria atrás de um load balancer em produção, e
+     já abre o navegador na página de demonstração (http://127.0.0.1:8000/).
+  2. Modo terminal (--terminal): gera transações sintéticas (Faker) e roda inferência
+     real sobre elas, imprimindo a decisão no terminal — sem navegador, bom para uma
+     demo rápida em sala.
 
 Uso:
-    python main.py                    # demonstracao funcional (Faker + inferencia real)
-    python main.py --n 10             # gera 10 transacoes em vez de 6
-    python main.py --serve            # sobe a API de inferencia real (Ctrl+C para parar)
-    python main.py --serve --port 8080
+    python main.py                    # sobe a API e abre o navegador (Ctrl+C para parar)
+    python main.py --port 8080        # porta 8001 e o padrao (8000 costuma estar ocupada pelo WSL)
+    python main.py --terminal         # demonstracao no terminal (Faker + inferencia real)
+    python main.py --terminal --n 10  # gera 10 transacoes em vez de 6
 
 Pré-requisito: modelo treinado. Se faltar, este script avisa e para — rode
 `python run_pipeline.py` primeiro (treina em ~1 minuto, ver README.md).
@@ -46,9 +46,14 @@ def _ensure_model_trained(config: dict) -> None:
 
 
 def run_serve(port: int) -> None:
+    import threading
+    import webbrowser
+
     import uvicorn
 
-    print(f"Subindo a API de inferencia em http://127.0.0.1:{port}/docs (Ctrl+C para parar)")
+    url = f"http://127.0.0.1:{port}/"
+    print(f"Subindo a API de inferencia em {url} (Ctrl+C para parar)")
+    threading.Timer(1.5, lambda: webbrowser.open(url)).start()
     uvicorn.run("deploy.api:app", host="127.0.0.1", port=port, reload=False)
 
 
@@ -63,22 +68,22 @@ def main() -> None:
         description="Detecção de Fraude em Cartão de Crédito — modelo em operação"
     )
     parser.add_argument(
-        "--serve", action="store_true",
-        help="Sobe a API de inferência real (FastAPI/uvicorn) em vez da demo de terminal",
+        "--terminal", action="store_true",
+        help="Demo de terminal (Faker + inferencia) em vez de subir a API",
     )
-    parser.add_argument("--port", type=int, default=8000, help="Porta da API (usado com --serve)")
+    parser.add_argument("--port", type=int, default=8001, help="Porta da API (modo servidor)")
     parser.add_argument(
-        "--n", type=int, default=6, help="Número de transações sintéticas na demo de terminal",
+        "--n", type=int, default=6, help="Número de transações sintéticas (usado com --terminal)",
     )
     args = parser.parse_args()
 
     config = load_config()
     _ensure_model_trained(config)
 
-    if args.serve:
-        run_serve(args.port)
-    else:
+    if args.terminal:
         run_demo(args.n)
+    else:
+        run_serve(args.port)
 
 
 if __name__ == "__main__":
