@@ -72,7 +72,7 @@ reports/
   *.json                       # métricas, benchmarks e resumos, em formato estruturado
 models/                        # artefatos do modelo treinado (gerado ao rodar o pipeline)
 smoke_test.py                  # demonstração funcional mínima
-main.py                        # ⭐ ponto de entrada único: modelo "em operação" — demo ou API
+main.py                        # ponto de entrada único: modelo "em operação" — demo ou API
 .github/workflows/ci.yml       # esteira de validação (GitHub Actions)
 ```
 
@@ -107,6 +107,40 @@ Com `--serve`, a API fica disponível em `http://127.0.0.1:8000/docs` (Swagger
 interativo) — o mesmo tipo de processo que rodaria atrás de um load balancer em
 produção. Sem `--serve`, roda a demonstração de terminal direto, sem precisar de
 navegador nem Postman — melhor para uma demo rápida em sala.
+
+## Visualizador do ciclo de vida do modelo — `frontend/`
+
+Além da API e da página de demonstração embutida em `deploy/api.py`, existe um segundo
+front-end, mais avançado: um app React (React Flow + D3 + Framer Motion) que visualiza
+o **ciclo de vida completo** do modelo — não só uma predição isolada — como um grafo
+animado: ingestão → pré-processamento → treino → validação → explicabilidade →
+artefato/registry → deploy → monitoramento de drift, com um laço de volta para
+retreino.
+
+Dois modos, ambos alimentados por dados reais via Server-Sent Events (SSE):
+
+- **Replay do treino**: reproduz, em velocidade ajustável, uma execução real e já
+  capturada da pipeline (não treina nada ao vivo). Antes de usar, gere a captura uma
+  vez:
+  ```bash
+  python -m deploy.capture_training_events    # grava reports/training_events.json
+  ```
+- **Ao vivo (inferência)**: cada `POST /predict` real (inclusive os disparados pela
+  página de demo em `/`) pulsa o nó "Deploy/API" em tempo real.
+
+O nó de retreino se acende sozinho quando o PSI real de `reports/drift_report.json`
+(gerado por `monitoring/drift_monitor.py`) ultrapassa o limiar — nunca um valor
+simulado.
+
+Como rodar (dois processos):
+
+```bash
+python main.py --serve --port 8001      # backend, se ainda não estiver no ar
+
+cd frontend
+npm install                              # só na primeira vez
+npm run dev                              # abre em http://localhost:5173
+```
 
 ## Esteira de validação (CI — GitHub Actions) e os três ambientes
 
