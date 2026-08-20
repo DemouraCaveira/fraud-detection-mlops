@@ -1,0 +1,146 @@
+[
+  {
+    "stage": "ingestao",
+    "type": "start",
+    "label": "Baixando/lendo dataset bruto (OpenML data_id=1597)",
+    "payload": {},
+    "ts_offset_s": 0.0
+  },
+  {
+    "stage": "ingestao",
+    "type": "end",
+    "label": "Dataset validado",
+    "payload": {
+      "n_linhas": 284807,
+      "n_colunas": 31,
+      "taxa_fraude_pct": 0.1727485630620034
+    },
+    "ts_offset_s": 0.879
+  },
+  {
+    "stage": "preprocessamento",
+    "type": "start",
+    "label": "Feature engineering + split temporal",
+    "payload": {},
+    "ts_offset_s": 0.879
+  },
+  {
+    "stage": "preprocessamento",
+    "type": "end",
+    "label": "Splits prontos",
+    "payload": {
+      "n_treino": 199364,
+      "n_validacao": 42721,
+      "n_teste": 42722
+    },
+    "ts_offset_s": 2.091
+  },
+  {
+    "stage": "treino",
+    "type": "start",
+    "label": "Baseline (LogReg) + tuning Optuna + LightGBM final",
+    "payload": {},
+    "ts_offset_s": 2.091
+  },
+  {
+    "stage": "treino",
+    "type": "end",
+    "label": "Modelo treinado",
+    "payload": {
+      "n_arvores": 202,
+      "baseline_train_s": 2.517,
+      "main_train_s": 3.744,
+      "best_params": {
+        "num_leaves": 55,
+        "max_depth": 4,
+        "learning_rate": 0.020516314053586622,
+        "min_child_samples": 52,
+        "n_estimators": 297,
+        "reg_alpha": 0.5722833307113401,
+        "reg_lambda": 0.020569104915488193,
+        "feature_fraction": 0.7611666319354351,
+        "bagging_fraction": 0.8305637155623654,
+        "bagging_freq": 3,
+        "scale_pos_weight": 518.1770833333334
+      }
+    },
+    "ts_offset_s": 66.159
+  },
+  {
+    "stage": "validacao",
+    "type": "start",
+    "label": "Cross-validation, threshold de custo, benchmarks de escala/complexidade",
+    "payload": {},
+    "ts_offset_s": 66.159
+  },
+  {
+    "stage": "validacao",
+    "type": "end",
+    "label": "Validacao concluida",
+    "payload": {
+      "pr_auc_teste": 0.7264586431983624,
+      "roc_auc_teste": 0.9686786789493609,
+      "cv_pr_auc_mean": 0.8205870205849031,
+      "gap_generalizacao_temporal": 0.09412837738654067
+    },
+    "ts_offset_s": 601.898
+  },
+  {
+    "stage": "explicabilidade",
+    "type": "start",
+    "label": "SHAP TreeExplainer sobre o conjunto de teste",
+    "payload": {},
+    "ts_offset_s": 601.9
+  },
+  {
+    "stage": "explicabilidade",
+    "type": "end",
+    "label": "Top atributos calculados",
+    "payload": {
+      "top_features": [
+        {
+          "feature": "V4",
+          "mean_abs_shap": 0.6827889715441047
+        },
+        {
+          "feature": "V8",
+          "mean_abs_shap": 0.42942696383383316
+        },
+        {
+          "feature": "V14",
+          "mean_abs_shap": 0.37178786646143397
+        },
+        {
+          "feature": "V1",
+          "mean_abs_shap": 0.3573417651652678
+        },
+        {
+          "feature": "hour_sin",
+          "mean_abs_shap": 0.31743636253526225
+        }
+      ]
+    },
+    "ts_offset_s": 605.22
+  },
+  {
+    "stage": "drift",
+    "type": "start",
+    "label": "PSI/KS — treino vs. teste e simulacao de choque em Amount",
+    "payload": {},
+    "ts_offset_s": 605.22
+  },
+  {
+    "stage": "drift",
+    "type": "end",
+    "label": "Relatorio de drift gerado",
+    "payload": {
+      "psi_maximo_real": 7.483103670519023,
+      "status_geral": "significativo",
+      "thresholds": {
+        "moderado": 0.1,
+        "significativo": 0.25
+      }
+    },
+    "ts_offset_s": 607.994
+  }
+]

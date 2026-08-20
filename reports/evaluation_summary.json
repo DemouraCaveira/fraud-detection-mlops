@@ -56,104 +56,104 @@
     {
       "multiplier": 1,
       "n_rows": 199364,
-      "train_seconds": 2.5399907999963034
+      "train_seconds": 3.492538099992089
     },
     {
       "multiplier": 2,
       "n_rows": 398728,
-      "train_seconds": 4.9937051000015344
+      "train_seconds": 12.783406999980798
     },
     {
       "multiplier": 5,
       "n_rows": 996820,
-      "train_seconds": 11.455009500001324
+      "train_seconds": 17.412817899981746
     },
     {
       "multiplier": 10,
       "n_rows": 1993640,
-      "train_seconds": 23.248179000001983
+      "train_seconds": 28.675029599980917
     },
     {
       "multiplier": 20,
       "n_rows": 3987280,
-      "train_seconds": 42.48676639999758
+      "train_seconds": 54.57666260001133
     }
   ],
   "complexity_comparison": [
     {
       "n_rows": 5000,
       "model": "KNN (O(n))",
-      "latency_ms_p50": 2.574799997091759
+      "latency_ms_p50": 2.9296499997144565
     },
     {
       "n_rows": 5000,
       "model": "Regressao Logistica (O(d))",
-      "latency_ms_p50": 0.625100001343526
+      "latency_ms_p50": 0.6203999946592376
     },
     {
       "n_rows": 5000,
       "model": "LightGBM (O(k*log folhas))",
-      "latency_ms_p50": 1.2464500032365322
+      "latency_ms_p50": 1.1597499978961423
     },
     {
       "n_rows": 20000,
       "model": "KNN (O(n))",
-      "latency_ms_p50": 3.0187500051397365
+      "latency_ms_p50": 3.4190500009572133
     },
     {
       "n_rows": 20000,
       "model": "Regressao Logistica (O(d))",
-      "latency_ms_p50": 0.5047500017099082
+      "latency_ms_p50": 0.6137000018497929
     },
     {
       "n_rows": 20000,
       "model": "LightGBM (O(k*log folhas))",
-      "latency_ms_p50": 1.2712000025203452
+      "latency_ms_p50": 1.292100001592189
     },
     {
       "n_rows": 50000,
       "model": "KNN (O(n))",
-      "latency_ms_p50": 3.3856500012916513
+      "latency_ms_p50": 4.311299999244511
     },
     {
       "n_rows": 50000,
       "model": "Regressao Logistica (O(d))",
-      "latency_ms_p50": 0.5926499979977962
+      "latency_ms_p50": 0.5755000020144507
     },
     {
       "n_rows": 50000,
       "model": "LightGBM (O(k*log folhas))",
-      "latency_ms_p50": 1.0849999998754356
+      "latency_ms_p50": 1.151799995568581
     },
     {
       "n_rows": 100000,
       "model": "KNN (O(n))",
-      "latency_ms_p50": 4.104499999812106
+      "latency_ms_p50": 5.168750009033829
     },
     {
       "n_rows": 100000,
       "model": "Regressao Logistica (O(d))",
-      "latency_ms_p50": 0.5965500022284687
+      "latency_ms_p50": 0.6219500064617023
     },
     {
       "n_rows": 100000,
       "model": "LightGBM (O(k*log folhas))",
-      "latency_ms_p50": 1.1168500022904482
+      "latency_ms_p50": 1.1582000006455928
     },
     {
       "n_rows": 199364,
       "model": "KNN (O(n))",
-      "latency_ms_p50": 7.962449999467935
+      "latency_ms_p50": 9.144049996393733
     },
     {
       "n_rows": 199364,
       "model": "Regressao Logistica (O(d))",
-      "latency_ms_p50": 0.5997000007482711
+      "latency_ms_p50": 0.6268000142881647
     },
     {
       "n_rows": 199364,
       "model": "LightGBM (O(k*log folhas))",
-      "latency_ms_p50": 1.2442000006558374
+      "latency_ms_p50": 1.1827999987872317
     }
   ]
 }
